@@ -10,7 +10,7 @@ def td(*args)
    if arg.is_a?(Symbol)
       result << arg
    else
-      result << "<ci>#{arg.to_s}</ci>"
+      result << input_token(arg)
    end
   end
   result << '</apply>'
@@ -23,7 +23,7 @@ def plus(*args)
    if arg.is_a?(Symbol)
       result << arg
    else
-      result << "<ci>#{arg.to_s}</ci>"
+      result << input_token(arg) 
    end
   end
   result << '</apply>'
@@ -41,7 +41,7 @@ def minus(*args)
    if arg.is_a?(Symbol)
       result << arg
    else
-      result << "<ci>#{arg.to_s}</ci>"
+      result << input_token(arg)
    end
   end
   result << '</apply>'
@@ -53,6 +53,13 @@ def getd
  @d 
 end
 
+def input_token(arg)
+ if arg.is_a?(String) 
+  "<ci>"+arg+"</ci>"
+ else 
+  "<cn>#{arg.to_s}</cn>"
+ end
+end
 
 def method_missing(method_name,*args,&block)
 	if method_name[-3..-1] == '_is'
