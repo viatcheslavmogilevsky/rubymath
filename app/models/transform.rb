@@ -73,7 +73,11 @@ def rec(args)
   if arg.is_a?(String)
     puts arg
   else
-    rec @d[arg]
+    if @d[arg].nil? 
+       puts "<cs>#{arg.to_s}</cs>"
+    else
+       rec @d[arg]
+    end
   end
  end
 end
