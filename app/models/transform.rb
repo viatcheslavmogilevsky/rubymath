@@ -31,7 +31,7 @@ def plus(*args)
 end
 
 
-def start(arg)
+def begin(arg)
   @root = arg 
 end
 
@@ -82,7 +82,7 @@ def rec(args)
  end
 end
 
-def finish
+def complete
  rec @root 
 end
 
