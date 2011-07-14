@@ -35,6 +35,7 @@ def begin(arg)
   @root = arg 
 end
 
+
 def minus(*args)
  result = ['<apply>','<minus />']
   args.each do |arg|
@@ -71,7 +72,7 @@ end
 def rec(args)
  args.each do |arg|
   if arg.is_a?(String)
-    puts arg
+     puts arg
   else
     if @d[arg].nil? 
        puts "<cs>#{arg.to_s}</cs>"
@@ -85,5 +86,7 @@ end
 def complete
  rec @root 
 end
+
+
 
 end
