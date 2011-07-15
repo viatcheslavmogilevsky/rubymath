@@ -12,12 +12,12 @@ def apply(operator, *args)
    if arg.is_a?(Symbol)
       result << arg
    else
-      result << input_token(arg)
+      result << ' '+input_token(arg)
    end
   end
   result << '</apply>'
 end
-
+=begin
  
 def td(*args)
   result = ['<apply>','<times />']
@@ -44,13 +44,13 @@ def plus(*args)
   result << '</apply>'
 
 end
-
+=end
 
 def begin(arg)
   @root = arg 
 end
 
-
+=begin
 def minus(*args)
  result = ['<apply>','<minus />']
   args.each do |arg|
@@ -64,6 +64,7 @@ def minus(*args)
 
 
 end
+=end
 
 def getd
  @d 
@@ -84,22 +85,22 @@ def method_missing(method_name,*args,&block)
  end
 end
 
-def rec(args)
+def rec(space_count,args)
  args.each do |arg|
   if arg.is_a?(String)
-     puts arg
+     puts " "*space_count+arg
   else
     if @d[arg].nil? 
-       puts "<cs>#{arg.to_s}</cs>"
+       puts " "*space_count+"<cs>#{arg.to_s}</cs>"
     else
-       rec @d[arg]
+       rec space_count+2, @d[arg]
     end
   end
  end
 end
 
 def complete
- rec @root 
+ rec 1,@root 
 end
 
 
