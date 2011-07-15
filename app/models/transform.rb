@@ -7,7 +7,7 @@ end
 
 
 def apply(operator, *args)
- result = ['<apply>', "<#{operator.to_s} />"]
+ result = ['<apply>', " <#{operator.to_s} />"]
  args.each do |arg|
    if arg.is_a?(Symbol)
       result << arg
