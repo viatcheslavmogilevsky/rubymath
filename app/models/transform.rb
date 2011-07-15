@@ -3,6 +3,21 @@ class Transform
 def initialize
  @d = {}
 end
+
+
+
+def apply(operator, *args)
+ result = ['<apply>', "<#{operator.to_s} />"]
+ args.each do |arg|
+   if arg.is_a?(Symbol)
+      result << arg
+   else
+      result << input_token(arg)
+   end
+  end
+  result << '</apply>'
+end
+
  
 def td(*args)
   result = ['<apply>','<times />']
