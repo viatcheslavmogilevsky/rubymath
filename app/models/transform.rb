@@ -46,6 +46,11 @@ def plus(*args)
 end
 =end
 
+def check_op(arg)
+ if arg  
+ end
+end
+
 def begin(arg)
   @root = arg 
 end
@@ -91,7 +96,7 @@ def rec(space_count,args)
      puts " "*space_count+arg
   else
     if @d[arg].nil? 
-       puts " "*space_count+"<cs>#{arg.to_s}</cs>"
+      puts " "*space_count+" <cs>#{arg.to_s}</cs>"
     else
        rec space_count+2, @d[arg]
     end
