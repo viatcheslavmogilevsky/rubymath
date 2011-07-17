@@ -73,6 +73,7 @@ def interval(str,*args)
 end
 
 
+
 =begin
  
 def td(*args)
@@ -102,10 +103,7 @@ def plus(*args)
 end
 =end
 
-def check_op(arg)
- if arg  
- end
-end
+
 
 def begin(arg)
   @root = arg 
@@ -139,11 +137,34 @@ def input_token(arg)
  end
 end
 
+def generate(tag,args)
+ h = args[0]
+ unless h.empty? 
+  h = ' '+h
+ end
+ result = ["<#{tag}#{h}>"]
+ args[1..-1].each do |arg|
+   if arg.is_a?(Symbol)
+      result << arg
+   else
+      result << ' '+input_token(arg)
+   end
+ end
+
+ result << "</#{tag}>"
+
+end
+
 def method_missing(method_name,*args,&block)
 	if method_name[-3..-1] == '_is'
 	 @d[method_name[0..-4].to_sym] = args[0]
-        else raise NoMethodError
- end
+        else 
+         if method_name[-1] == '!'
+          generate(method_name[0..-2],args)
+         else
+          raise NoMethodError 
+         end       
+        end
 end
 
 def rec(space_count,args)
