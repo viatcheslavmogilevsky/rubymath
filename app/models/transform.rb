@@ -4,19 +4,75 @@ def initialize
  @d = {}
 end
 
-
-
-def apply(operator, *args)
- result = ['<apply>', " <#{operator.to_s} />"]
+=begin
+def input(result,*args)
  args.each do |arg|
    if arg.is_a?(Symbol)
       result << arg
    else
       result << ' '+input_token(arg)
    end
-  end
+ end
+end
+=end
+
+def apply(operator, *args)
+ result = ['<apply>']#, " <#{operator.to_s} />"]
+
+ if operator.is_a?(String)
+    result << " <#{operator} />"
+ else
+    result << operator
+ end
+
+ args.each do |arg|
+   if arg.is_a?(Symbol)
+      result << arg
+   else
+      result << ' '+input_token(arg)
+   end
+ end
+
+  #input(result,args) 
   result << '</apply>'
 end
+
+
+def interval(str,*args)
+ cl = []
+
+ if str[0] == '('
+    cl[0] = 'open'
+ else 
+    cl[0] = 'closed'
+ end
+
+ if str[1] == ')'
+    cl[1] = 'open'
+ else
+    cl[1] = 'closed'
+ end
+
+ if cl[0] == cl[1] 
+    cl[1] = ''
+ else 
+    cl[1] = '-'+cl[1]
+ end
+
+ result = ['<interval closure="'+cl[0]+cl[1]+'">']
+ #input(result,args)
+ args.each do |arg|
+   if arg.is_a?(Symbol)
+      result << arg
+   else
+      result << ' '+input_token(arg)
+   end
+ end
+ 
+ result << '</interval>'
+end
+
+
 =begin
  
 def td(*args)
