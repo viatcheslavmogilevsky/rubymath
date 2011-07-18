@@ -2,35 +2,49 @@ class Transform
 
 def initialize
  @d = {}
+ @w = {:+ => :plus,
+       :plus => :plus,
+       :* => :times,
+       :times => :times,
+       :/ => :divide,
+       :divide => :divide,
+       :- => :minus,
+       :minus => :minus,
+       :"=" => :eq
+       :<= => :}
 end
 
-=begin
-def input(result,*args)
- args.each do |arg|
-   if arg.is_a?(Symbol)
-      result << arg
-   else
-      result << ' '+input_token(arg)
-   end
+
+
+def input(arg)
+
+ if arg.is_a?(Symbol)
+    arg
+ else 
+    input_token(arg)
  end
+
+# args.each do |arg|
+ #  if arg.is_a?(Symbol)
+  #    result << arg
+   #else
+      #result << ' '+input_token(arg)
+  # end
+ #end
 end
-=end
+
 
 def apply(operator, *args)
  result = ['<apply>']#, " <#{operator.to_s} />"]
 
  if operator.is_a?(String)
-    result << " <#{operator} />"
+    result << " <#{@w[operator.to_sym]} />"
  else
     result << operator
  end
 
  args.each do |arg|
-   if arg.is_a?(Symbol)
-      result << arg
-   else
-      result << ' '+input_token(arg)
-   end
+   result << input(arg)
  end
 
   #input(result,args) 
@@ -62,11 +76,7 @@ def interval(str,*args)
  result = ['<interval closure="'+cl[0]+cl[1]+'">']
  #input(result,args)
  args.each do |arg|
-   if arg.is_a?(Symbol)
-      result << arg
-   else
-      result << ' '+input_token(arg)
-   end
+   result << input(arg)
  end
  
  result << '</interval>'
@@ -144,11 +154,7 @@ def generate(tag,args)
  end
  result = ["<#{tag}#{h}>"]
  args[1..-1].each do |arg|
-   if arg.is_a?(Symbol)
-      result << arg
-   else
-      result << ' '+input_token(arg)
-   end
+   result << input(arg)
  end
 
  result << "</#{tag}>"
