@@ -2,16 +2,17 @@ class Transform
 
 def initialize
  @d = {}
- @w = {:+ => :plus,
-       :plus => :plus,
+ @aliases = {:+ => :plus,
        :* => :times,
-       :times => :times,
        :/ => :divide,
-       :divide => :divide,
        :- => :minus,
-       :minus => :minus,
-       :"=" => :eq
-       :<= => :}
+       :"=" => :eq,
+       :<= => :leq,
+       :>= => :geq,
+       :"<>" => :neq,
+       :"=!" => :neq,
+	:< => :lt,
+	:> => :gt,}
 end
 
 
@@ -23,22 +24,23 @@ def input(arg)
  else 
     input_token(arg)
  end
+end
 
-# args.each do |arg|
- #  if arg.is_a?(Symbol)
-  #    result << arg
-   #else
-      #result << ' '+input_token(arg)
-  # end
- #end
+def getoper(arg)
+if @aliases[arg.to_sym].nil?
+   " <#{arg}/>"
+else
+   " <#{@aliases[arg.to_sym]}/>"
+end
+  
 end
 
 
 def apply(operator, *args)
- result = ['<apply>']#, " <#{operator.to_s} />"]
+ result = ['<apply>']
 
  if operator.is_a?(String)
-    result << " <#{@w[operator.to_sym]} />"
+    result << getoper(operator)
  else
     result << operator
  end
@@ -47,7 +49,6 @@ def apply(operator, *args)
    result << input(arg)
  end
 
-  #input(result,args) 
   result << '</apply>'
 end
 
@@ -74,7 +75,6 @@ def interval(str,*args)
  end
 
  result = ['<interval closure="'+cl[0]+cl[1]+'">']
- #input(result,args)
  args.each do |arg|
    result << input(arg)
  end
@@ -84,34 +84,7 @@ end
 
 
 
-=begin
- 
-def td(*args)
-  result = ['<apply>','<times />']
-  args.each do |arg|
-   if arg.is_a?(Symbol)
-      result << arg
-   else
-      result << input_token(arg)
-   end
-  end
-  result << '</apply>'
 
-end
-
-def plus(*args)
- result = ['<apply>','<plus />']
-  args.each do |arg|
-   if arg.is_a?(Symbol)
-      result << arg
-   else
-      result << input_token(arg) 
-   end
-  end
-  result << '</apply>'
-
-end
-=end
 
 
 
@@ -119,21 +92,6 @@ def begin(arg)
   @root = arg 
 end
 
-=begin
-def minus(*args)
- result = ['<apply>','<minus />']
-  args.each do |arg|
-   if arg.is_a?(Symbol)
-      result << arg
-   else
-      result << input_token(arg)
-   end
-  end
-  result << '</apply>'
-
-
-end
-=end
 
 def getd
  @d 
