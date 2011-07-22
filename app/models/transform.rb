@@ -25,20 +25,20 @@ def spos
 end
 
 def rec(arg)
+ flag = false
  result = "#{arg[:name]}("
  arg[:operands].each do |elem|
-  #result += "," if flag
+  result += "," if flag
   if elem.is_a?(Symbol)
      unless @d[elem].nil?
-       str = rec(@d[elem])
-       result += str.to_s
+       result += rec(@d[elem])
      else
        result += elem.to_s
      end
   else
    result += elem.to_s
   end
-  #flag = true
+  flag = true
  end
  result += ")"
 end
