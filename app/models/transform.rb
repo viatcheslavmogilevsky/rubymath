@@ -2,7 +2,7 @@ class Transform
 
 def initialize
  @d = {}
- @e = []
+
 end
 
 def getd
@@ -67,7 +67,6 @@ etape 1: + -(2)  * /  %(1) ^ (0)  @@@@@@@@@  _ ! @@@@@@@@@@@@  and 1234
 
 
 
-
 def getContentML
 
 end
@@ -76,9 +75,10 @@ end
 
 def parsing(arg)
  stack = []
- pr = [43]
+ pr = [44,43]
  op = []
  nh = {}
+ res = []
  arr = arg.scan(/\d+(?:\.\d+)?|[\/%*!\^\(\)=]|\+\-?|\-\+?|:\w+:|\w+/)
  arr << 42 # :-)
  arr.each do |elem|
@@ -98,35 +98,56 @@ def parsing(arg)
             op << elem
 	    pr << 42 # xD
 	end 
-	if pr.size > 1		
+		
 		while pr[-1] >= pr[-2]
 		   nh[:name] = op[-2]
  		   nh[:operands] = stack[-2..-1]
-		   @e <<  nh
+		   res <<  nh
 		   stack.pop
-		   stack[-1] = @e.size - 1
+		   stack[-1] = res.size - 1
  	           nh = {}
-		   #pr[-2] = pr[-1]
-		   #pr.pop
-	           #op[-2] = op[-1]
-		   #op.pop
 		   pr.delete_at(-2)
 		   op.delete_at(-2)
 		end	  
-	end
+	
         #puts "ARR #{arr.inspect}"
-        puts "STACK#{stack.inspect}"
-        puts "PR #{pr.inspect}"
-	puts "OP #{op.inspect}"
-        puts "E #{@e}"
-        puts "---------------------"
+       # puts "STACK#{stack.inspect}"
+       # puts "PR #{pr.inspect}"
+#	 puts "OP #{op.inspect}"
+ #       puts "E #{@e}"
+  #      puts "---------------------"
 
 
  end
-
-
-
-
+#  p res.inspect
+  pr.clear
+  stack.clear
+  stack << res.last
+  pr << res.size - 1
+  until stack.empty?
+    el = stack.shift
+    eli = pr.shift
+    if el[:name] =~ /\+|\*/
+     el[:operands].each do |i|
+      if i.is_a?(Fixnum)
+      	if res[i][:name] == el[:name]
+ 		res[eli][:operands].concat(res[i][:operands])
+		res.delete_at i
+        end
+      end
+     end
+    end
+    el[:operands].each do |i|
+     if i.is_a?(Fixnum)
+        stack << res[i]
+        pr << i
+     end
+    end 
+	puts "STACK #{stack.inspect}"
+	puts "PR #{pr.inspect}"
+  end
+  
+  res
 
 end
 
@@ -137,7 +158,7 @@ end
 def method_missing(method_name,*args,&block)
  if method_name[-3..-1] == '_is'
     nd = {}
-    nd[:name] = args[0]
+    nd[:name] = args[0] if args[0].nil?
     nd[:operands] = args[1]
     nd[:params] = args[2]
     @d[method_name[0..-4].to_sym] = nd
