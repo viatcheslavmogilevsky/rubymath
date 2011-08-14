@@ -72,33 +72,65 @@ def getContentML
 
 end
 
+
+
 def parsing(arg)
  stack = []
- pr = []
+ pr = [43]
+ op = []
+ nh = {}
  arr = arg.scan(/\d+(?:\.\d+)?|[\/%*!\^\(\)=]|\+\-?|\-\+?|:\w+:|\w+/)
+ arr << 42 # :-)
  arr.each do |elem|
 	case elem
 	  when /\d+/
 	   stack << elem
 	  when /\^/
-	    pr << [elem,0]
+	    op << elem
+	    pr << 0
           when /[\/%*]/
-	    pr << [elem,1]
+	    op << elem
+	    pr << 1
 	  when /\+\-?|\-\+?/
- 	    pr << [elem,3]
-	end
-	if pr.size > 1
-		
-		if pr[-1][1] 
-
+ 	    op << elem
+	    pr <<  2
+	  when 42
+            op << elem
+	    pr << 42 # xD
+	end 
+	if pr.size > 1		
+		while pr[-1] >= pr[-2]
+		   nh[:name] = op[-2]
+ 		   nh[:operands] = stack[-2..-1]
+		   @e <<  nh
+		   stack.pop
+		   stack[-1] = @e.size - 1
+ 	           nh = {}
+		   #pr[-2] = pr[-1]
+		   #pr.pop
+	           #op[-2] = op[-1]
+		   #op.pop
+		   pr.delete_at(-2)
+		   op.delete_at(-2)
 		end	  
+	end
+        #puts "ARR #{arr.inspect}"
+        puts "STACK#{stack.inspect}"
+        puts "PR #{pr.inspect}"
+	puts "OP #{op.inspect}"
+        puts "E #{@e}"
+        puts "---------------------"
 
-        end
 
  end
+
+
+
+
+
 end
 
-private :parsing
+#private :parsing, :synonim
 
 
 
