@@ -133,7 +133,8 @@ def parsing(arg)
       		  if i.is_a?(Fixnum)
       	          if res[i][:name] == res[eli][:name]
  		     res[eli][:operands].concat(res[i][:operands])
-		     res[i][:name] = "nil"
+		     res[i][:name] = nil
+  	    	     res[i][:operands] = []
                   end
                   end
                 end
