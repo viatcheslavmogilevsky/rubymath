@@ -79,72 +79,76 @@ def parsing(arg)
  op = []
  nh = {}
  res = []
- arr = arg.scan(/\d+(?:\.\d+)?|[\/%*!\^\(\)=]|\+\-?|\-\+?|:\w+:|\w+/)
+ arr = arg.scan(/\d+(?:\.\d+)?|[\/%*!\^\(\)=\+\-]|:\w+:|\w+/)
  arr << 42 # :-)
  arr.each do |elem|
-	case elem
-	  when /\d+/
+ case elem
+	when /\d+/
 	   stack << elem
-	  when /\^/
+	when /\^/
 	    op << elem
 	    pr << 0
-          when /[\/%*]/
+        when /[\/%*]/
 	    op << elem
 	    pr << 1
-	  when /\+\-?|\-\+?/
+	when /\+\-?|\-\+?/
  	    op << elem
 	    pr <<  2
-	  when 42
+	when 42
             op << elem
 	    pr << 42 # xD
-	end 
+ end 
 		
-		while pr[-1] >= pr[-2]
-		   nh[:name] = op[-2]
- 		   nh[:operands] = stack[-2..-1]
-		   res <<  nh
-		   stack.pop
-		   stack[-1] = res.size - 1
- 	           nh = {}
-		   pr.delete_at(-2)
-		   op.delete_at(-2)
-		end	  
+ while pr[-1] >= pr[-2]
+
+	nh[:name] = op[-2]
+  	nh[:operands] = stack[-2..-1]
+	res <<  nh
+	stack.pop
+	stack[-1] = res.size - 1
+ 	nh = {}
+	pr.delete_at(-2)
+	op.delete_at(-2)
+
+ end	  
 	
-        #puts "ARR #{arr.inspect}"
-       # puts "STACK#{stack.inspect}"
-       # puts "PR #{pr.inspect}"
-#	 puts "OP #{op.inspect}"
- #       puts "E #{@e}"
-  #      puts "---------------------"
+        
 
 
  end
-#  p res.inspect
+
   pr.clear
-  stack.clear
-  stack << res.last
+ # stack.clear
+ # stack << res.last
   pr << res.size - 1
-  until stack.empty?
-    el = stack.shift
+  until pr.empty?
+   # puts "___________"
+   # puts "STACK #{stack.inspect}"
+   # puts "PR #{pr.inspect}"
+
+    #el = stack.shift
     eli = pr.shift
-    if el[:name] =~ /\+|\*/
-     el[:operands].each do |i|
-      if i.is_a?(Fixnum)
-      	if res[i][:name] == el[:name]
- 		res[eli][:operands].concat(res[i][:operands])
-		res.delete_at i
-        end
-      end
-     end
+    if res[eli][:name] =~ /\+|\*/
+     		res[eli][:operands].each do |i|
+      		  if i.is_a?(Fixnum)
+      	          if res[i][:name] == res[eli][:name]
+ 		     res[eli][:operands].concat(res[i][:operands])
+		     res[i][:name] = "nil"
+                  end
+                  end
+                end
     end
-    el[:operands].each do |i|
+
+    res[eli][:operands].each do |i|
      if i.is_a?(Fixnum)
-        stack << res[i]
+        #stack << res[i]
         pr << i
      end
     end 
-	puts "STACK #{stack.inspect}"
-	puts "PR #{pr.inspect}"
+	#puts "--------------"
+	#puts "STACK #{stack.inspect}"
+	#puts "PR #{pr.inspect}"
+       # puts "_____________ "
   end
   
   res
