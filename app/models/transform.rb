@@ -84,17 +84,17 @@ def parsing(arg)
 end
 =end
 
-def parsing(arr)
+def parsing(arg)
  stack = []
  pr = [44,43]
  op = []
  nh = {}
  res = []
- arr = arg.scan(/\d+(?:\.\d+)?|[\/%*!\^=\+\-]|[:&]?\w+/)
+ arr = arg.scan(/\d+(?:\.\d+)?|[\/%*!\^\+\-<>]|[<>=!]?=~?|[:&]?\w+/)
  arr << 42 # :-)
  arr.each do |elem|
  case elem
-	when /\d+/
+	when /\d+(?:\.\d+)?|[:&]?\w+/
 	   stack << elem
 	when /\^/
 	    op << elem
@@ -105,6 +105,9 @@ def parsing(arr)
 	when /\+|\-/
  	    op << elem
 	    pr <<  2
+        when /[<>=!]?=~?|[<>]/
+	    op << elem
+	    pr << 3	    
 	when 42
             op << elem
 	    pr << 42 # xD
@@ -136,13 +139,17 @@ def parsing(arr)
   pr << res.size - 1
   until pr.empty?
     eli = pr.shift
-    if res[eli][:name] =~ /\+|\*/
-     		res[eli][:operands].each do |i|
+    if res[eli][:name] =~ /\+|\*|=/
+     		res[eli][:operands].each_with_index do |i,index|
       		  if i.is_a?(Fixnum)
       	          if res[i][:name] == res[eli][:name]
- 		     res[eli][:operands].concat(res[i][:operands])
+
+ 		     #res[eli][:operands].concat(res[i][:operands])
+			#res[eli][:operands][index] = res[i][:operands]
+			res[eli][:operands].insert index+1,res[i][:operands]
+			res[eli][:operands].flatten!
 		     res[i][:name] = nil
-  	    	     res[i][:operands].clear
+  	    	     res[i][:operands] = []
                   end
                   end
                 end
