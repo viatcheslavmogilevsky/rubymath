@@ -14,7 +14,7 @@ def puzzle()
 end
 
 # relations:
-#	:applex  < > = <= >= << >> =~  == != (7)
+#	:applex  < > = <= >= =~ == != (7)
 # simple operators: + -(6) % * /(5) ^(4) _(3) !(2)
 # boolean operators: & | -> &! |! =! = ~
 # all: ( ) (1)
@@ -44,42 +44,53 @@ etape 1: + -(2)  * /  %(1) ^ (0)  @@@@@@@@@  _ ! @@@@@@@@@@@@  and 1234
  
        5+4-56^2%5
 	5 + 4 - 56^2 % 5
-	is
- 		<apply>
-		<plus>
-        	 <cn>5</cn>
-		 <apply>
-		  <minus>
-     		  <cn>4</cn>
-		  <apply>
-		   <quotient>
-		   <apply>
-		    <power>
-		    <cn>56</cn>
-		    <cn>2</cn>
-		   </apply>
-		   <cn>5</cn>
-		  </apply>
-		 </apply>
-		</apply>
+
  	 
 =end
 
+
+
+#def argscan(arg)
+# arg.scan(/\d+(?:\.\d+)?|[\/%*!\^\(\)=\+\-]|:\w+:|\w+/)
+#end
 
 
 def getContentML
 
 end
 
+=begin
+def open_closed(i,arr)
+ balance = 1
+ i+=1
+ while i < arr.size 
+	if arr[i] == "("
+		balance += 1
+        else
+		if arr[i] == ")"
+ 		 balance -= 1
+		end
+	end
+	break if balance == 0
+	i+=1
+ end
+ i 
+end
 
 
 def parsing(arg)
+ arr = arg.scan(/\d+(?:\.\d+)?|[\/%*!\^\(\)=\+\-]|:\w+:|\w+/)
+ parsing1 arr
+end
+=end
+
+def parsing(arr)
  stack = []
  pr = [44,43]
  op = []
  nh = {}
  res = []
- arr = arg.scan(/\d+(?:\.\d+)?|[\/%*!\^\(\)=\+\-]|:\w+:|\w+/)
+ arr = arg.scan(/\d+(?:\.\d+)?|[\/%*!\^=\+\-]|[:&]?\w+/)
  arr << 42 # :-)
  arr.each do |elem|
  case elem
@@ -91,14 +102,21 @@ def parsing(arg)
         when /[\/%*]/
 	    op << elem
 	    pr << 1
-	when /\+\-?|\-\+?/
+	when /\+|\-/
  	    op << elem
 	    pr <<  2
 	when 42
             op << elem
 	    pr << 42 # xD
- end 
-		
+#	when /\(/
+#           endof = open_closed(ind,arr)
+#	    temp = arr[ind..endof]
+#	    temp1 = parsing1(temp)
+#	    stack << temp1
+#	    arr[ind..endof] = nil
+#	    arr.delete_at(ind)
+ end 	
+	
  while pr[-1] >= pr[-2]
 
 	nh[:name] = op[-2]
@@ -111,22 +129,12 @@ def parsing(arg)
 	op.delete_at(-2)
 
  end	  
-	
-        
-
-
+	        
  end
 
   pr.clear
- # stack.clear
- # stack << res.last
   pr << res.size - 1
   until pr.empty?
-   # puts "___________"
-   # puts "STACK #{stack.inspect}"
-   # puts "PR #{pr.inspect}"
-
-    #el = stack.shift
     eli = pr.shift
     if res[eli][:name] =~ /\+|\*/
      		res[eli][:operands].each do |i|
@@ -134,22 +142,17 @@ def parsing(arg)
       	          if res[i][:name] == res[eli][:name]
  		     res[eli][:operands].concat(res[i][:operands])
 		     res[i][:name] = nil
-  	    	     res[i][:operands] = []
+  	    	     res[i][:operands].clear
                   end
                   end
                 end
     end
-
     res[eli][:operands].each do |i|
      if i.is_a?(Fixnum)
-        #stack << res[i]
         pr << i
      end
     end 
-	#puts "--------------"
-	#puts "STACK #{stack.inspect}"
-	#puts "PR #{pr.inspect}"
-       # puts "_____________ "
+	
   end
   
   res
