@@ -84,17 +84,19 @@ def parsing(arg)
 end
 =end
 
+
+
 def parsing(arg)
  stack = []
  pr = [44,43]
  op = []
  nh = {}
  res = []
- arr = arg.scan(/\d+(?:\.\d+)?|[\/%*!\^\+\-<>]|[<>=!]?=~?|[:&]?\w+/)
+ arr = arg.scan(/\d+(?:\.\d+)?|[<>!]=|[\/%*!\^\+\-<>]|=[=~]?|\(\w+\)/)
  arr << 42 # :-)
- arr.each do |elem|
+ arr.each_with_index do |elem,ind|
  case elem
-	when /\d+(?:\.\d+)?|[:&]?\w+/
+	when /\d+(?:\.\d+)?|\(\w+\)/
 	   stack << elem
 	when /\^/
 	    op << elem
@@ -105,28 +107,25 @@ def parsing(arg)
 	when /\+|\-/
  	    op << elem
 	    pr <<  2
-        when /[<>=!]?=~?|[<>]/
+        when /[<>!]=|=[=~]?|[<>]/
 	    op << elem
 	    pr << 3	    
 	when 42
             op << elem
 	    pr << 42 # xD
-#	when /\(/
-#           endof = open_closed(ind,arr)
-#	    temp = arr[ind..endof]
-#	    temp1 = parsing1(temp)
-#	    stack << temp1
-#	    arr[ind..endof] = nil
-#	    arr.delete_at(ind)
+	when /!/
+		op << elem
+		pr << -1
+		arr.insert ind+1,"0" 
  end 	
 	
  while pr[-1] >= pr[-2]
 
 	nh[:name] = op[-2]
-  	nh[:operands] = stack[-2..-1]
+	nh[:operands] = stack[-2..-1]
 	res <<  nh
-	stack.pop
-	stack[-1] = res.size - 1
+	stack.pop 
+        stack[-1] =  res.size - 1
  	nh = {}
 	pr.delete_at(-2)
 	op.delete_at(-2)
@@ -139,15 +138,12 @@ def parsing(arg)
   pr << res.size - 1
   until pr.empty?
     eli = pr.shift
-    if res[eli][:name] =~ /\+|\*|=/
+    if res[eli][:name] =~ /\+|\*|==?|[<>]=?/
      		res[eli][:operands].each_with_index do |i,index|
       		  if i.is_a?(Fixnum)
       	          if res[i][:name] == res[eli][:name]
-
- 		     #res[eli][:operands].concat(res[i][:operands])
-			#res[eli][:operands][index] = res[i][:operands]
-			res[eli][:operands].insert index+1,res[i][:operands]
-			res[eli][:operands].flatten!
+		     res[eli][:operands].insert index+1,res[i][:operands]
+		     res[eli][:operands].flatten!
 		     res[i][:name] = nil
   	    	     res[i][:operands] = []
                   end
@@ -161,7 +157,7 @@ def parsing(arg)
     end 
 	
   end
-  
+ 
   res
 
 end
