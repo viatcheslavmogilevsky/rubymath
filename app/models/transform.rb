@@ -92,31 +92,36 @@ def parsing(arg)
  op = []
  nh = {}
  res = []
- arr = arg.scan(/\d+(?:\.\d+)?|[<>!]=|[\/%*!\^\+\-<>]|=[=~]?|\(\w+\)/)
+ b = 0
+ arr = arg.scan(/\d+(?:\.\d+)?|[<>!]=|[\/%*!\^\+\-<>\(\)_]|=[=~]?|:\w+:|&[a-z]/)
  arr << 42 # :-)
  arr.each_with_index do |elem,ind|
  case elem
-	when /\d+(?:\.\d+)?|\(\w+\)/
+	when /\d+(?:\.\d+)?|:\w+:/
 	   stack << elem
 	when /\^/
 	    op << elem
-	    pr << 0
+	    pr << 1+b
         when /[\/%*]/
 	    op << elem
-	    pr << 1
+	    pr << 2+b
 	when /\+|\-/
  	    op << elem
-	    pr <<  2
+	    pr <<  3+b
         when /[<>!]=|=[=~]?|[<>]/
 	    op << elem
-	    pr << 3	    
+	    pr << 4+b	    
 	when 42
             op << elem
 	    pr << 42 # xD
 	when /!/
 		op << elem
-		pr << -1
+		pr << 0+b
 		arr.insert ind+1,"0" 
+	when /\(/
+		b -= 10
+	when /\)/
+		b += 10
  end 	
 	
  while pr[-1] >= pr[-2]
@@ -142,10 +147,10 @@ def parsing(arg)
      		res[eli][:operands].each_with_index do |i,index|
       		  if i.is_a?(Fixnum)
       	          if res[i][:name] == res[eli][:name]
-		     res[eli][:operands].insert index+1,res[i][:operands]
-		     res[eli][:operands].flatten!
-		     res[i][:name] = nil
-  	    	     res[i][:operands] = []
+		      res[eli][:operands].insert index+1,res[i][:operands]
+		      res[eli][:operands].flatten!
+		      res[i][:name] = nil
+  	    	      res[i][:operands] = []
                   end
                   end
                 end
@@ -168,13 +173,13 @@ end
 
 def method_missing(method_name,*args,&block)
  if method_name[-3..-1] == '_is'
-    nd = {}
-    nd[:name] = args[0] if args[0].nil?
-    nd[:operands] = args[1]
-    nd[:params] = args[2]
-    @d[method_name[0..-4].to_sym] = nd
+     nd = {}
+     nd[:name] = args[0] if args[0].nil?
+     nd[:operands] = args[1]
+     nd[:params] = args[2]
+     @d[method_name[0..-4].to_sym] = nd
  else 
-    raise NoMethodError    
+     raise NoMethodError    
  end
 end
 
