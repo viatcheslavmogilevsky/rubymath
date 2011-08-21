@@ -14,9 +14,10 @@ def puzzle()
 end
 
 # relations:
-#	:applex  < > = <= >= =~ == != (7)
-# simple operators: + -(6) % * /(5) ^(4) _(3) !(2)
-# boolean operators: & | -> &! |! =! = ~
+#	:applex  < > = <= >= =~  != (7)
+# simple operators: + -(6) div mod * /(5) ^(4)  !(2)
+		#	div- *- /- ^-
+# boolean operators: and or xor ->  = ~ not 
 # all: ( ) (1)
 # elem func: 
 	#sin		cos	tan	sec	csc	cot
@@ -93,33 +94,49 @@ def parsing(arg)
  nh = {}
  res = []
  b = 0
- arr = arg.scan(/\d+(?:\.\d+)?|[<>!]=|[\/%*!\^\+\-<>\(\)_]|=[=~]?|:\w+:|&[a-z]/)
+ f = true
+ arr = arg.scan(/\d+(?:\.\d+)?|[<>]=|[\/*!\^\+\-<>\(\)]|=[!~]?|\w+/)
  arr << 42 # :-)
  arr.each_with_index do |elem,ind|
  case elem
 	when /\d+(?:\.\d+)?|:\w+:/
 	   stack << elem
+	   f = false
 	when /\^/
 	    op << elem
 	    pr << 1+b
-        when /[\/%*]/
+   	    f = false	
+        when /[\/*]/
 	    op << elem
 	    pr << 2+b
-	when /\+|\-/
+	    f = false
+	when /\+/
  	    op << elem
 	    pr <<  3+b
-        when /[<>!]=|=[=~]?|[<>]/
+	when /\-/
+	    if f
+		op << elem + "-"
+		pr << 2+b
+            else
+		op << elem
+		pr << 3+b
+	    end
+		f = false
+        when /[<>]=|=~?|[<>]/
 	    op << elem
-	    pr << 4+b	    
+	    pr << 4+b	 
+	    f = true   
 	when 42
             op << elem
 	    pr << 42 # xD
 	when /!/
 		op << elem
 		pr << 0+b
-		arr.insert ind+1,"0" 
+		arr.insert ind+1,"0"
+		 
 	when /\(/
 		b -= 10
+		f = true
 	when /\)/
 		b += 10
  end 	
@@ -127,9 +144,13 @@ def parsing(arg)
  while pr[-1] >= pr[-2]
 
 	nh[:name] = op[-2]
-	nh[:operands] = stack[-2..-1]
+   	unless op[-2] == '--'
+		nh[:operands] = stack[-2..-1]
+	else
+		nh[:operands] = [stack[-1]]
+	end
 	res <<  nh
-	stack.pop 
+	stack.pop unless op[-2] == '--'
         stack[-1] =  res.size - 1
  	nh = {}
 	pr.delete_at(-2)
@@ -143,7 +164,7 @@ def parsing(arg)
   pr << res.size - 1
   until pr.empty?
     eli = pr.shift
-    if res[eli][:name] =~ /\+|\*|==?|[<>]=?/
+    if res[eli][:name] =~ /(\+|\*|=|[<>]=?)$/
      		res[eli][:operands].each_with_index do |i,index|
       		  if i.is_a?(Fixnum)
       	          if res[i][:name] == res[eli][:name]
