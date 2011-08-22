@@ -95,75 +95,83 @@ def parsing(arg)
  res = []
  b = 0
  f = true
- arr = arg.scan(/\d+(?:\.\d+)?|[<>]=|[\/*!\^\+\-<>\(\)]|=[!~]?|\w+/)
+ arr = arg.scan(/\d+(?:\.\d+)?|[<>]=|[\/*!\^\+\-<>\(\)]|=[!~]?|:\w+:|\[\w+\]|div|mod/)
  arr << 42 # :-)
  arr.each_with_index do |elem,ind|
- case elem
-	when /\d+(?:\.\d+)?|:\w+:/
-	   stack << elem
-	   f = false
-	when /\^/
-	    op << elem
-	    pr << 1+b
-   	    f = false	
-        when /[\/*]/
-	    op << elem
-	    pr << 2+b
-	    f = false
-	when /\+/
- 	    op << elem
-	    pr <<  3+b
-	when /\-/
-	    if f
-		op << elem + "-"
-		pr << 2+b
-            else
-		op << elem
-		pr << 3+b
-	    end
-		f = false
-        when /[<>]=|=~?|[<>]/
-	    op << elem
-	    pr << 4+b	 
-	    f = true   
-	when 42
-            op << elem
-	    pr << 42 # xD
-	when /!/
-		op << elem
-		pr << 0+b
-		arr.insert ind+1,"0"
-		 
-	when /\(/
-		b -= 10
-		f = true
-	when /\)/
-		b += 10
- end 	
+
+ 	case elem
+
+		when /\d+(?:\.\d+)?|:\w+:|\[\w+\]/
+	   		stack << elem
+	   		f = false
+		when /\^/
+	    		op << elem
+	    		pr << 1+b
+   	    		f = false	
+        	when /[\/*]|div|mod/
+	    		op << elem
+	    		pr << 2+b
+	    		f = false
+		when /\+/
+ 	    		op << elem
+	    		pr <<  3+b
+	    		f = false
+		when /\-/
+	    		if f
+	    		op << elem + "-"
+	    		pr << 2+b
+            		else
+   	    		op << elem
+	    		pr << 3+b
+	    		end
+	    		f = false
+        	when /[<>]=|=~?|[<>]/
+	    		op << elem
+	    		pr << 4+b	 
+	    		f = true   
+		when 42
+            		op << elem
+	    		pr << 42 # xD
+		when /!/
+	    		op << elem
+	    		pr << 0+b
+	    		arr.insert ind+1,"0"
+	    		f = false
+		when /\(/
+	    		b -= 10
+	    		f = true
+		when /\)/
+	    		b += 10
+	    		f = false
+
+ 	end 	
 	
- while pr[-1] >= pr[-2]
+ 	while pr[-1] >= pr[-2]
 
-	nh[:name] = op[-2]
-   	unless op[-2] == '--'
+		nh[:name] = op[-2]	
+   		unless op[-2] == '--'
 		nh[:operands] = stack[-2..-1]
-	else
+		stack.pop
+		else
 		nh[:operands] = [stack[-1]]
-	end
-	res <<  nh
-	stack.pop unless op[-2] == '--'
-        stack[-1] =  res.size - 1
- 	nh = {}
-	pr.delete_at(-2)
-	op.delete_at(-2)
+		end
+		res <<  nh
+        	stack[-1] =  res.size - 1
+ 		nh = {}
+		pr.delete_at(-2)
+		op.delete_at(-2)
 
- end	  
+ 	end	  
 	        
  end
 
   pr.clear
   pr << res.size - 1
+
   until pr.empty?
+
     eli = pr.shift
+
     if res[eli][:name] =~ /(\+|\*|=|[<>]=?)$/
      		res[eli][:operands].each_with_index do |i,index|
       		  if i.is_a?(Fixnum)
@@ -176,6 +184,7 @@ def parsing(arg)
                   end
                 end
     end
+
     res[eli][:operands].each do |i|
      if i.is_a?(Fixnum)
         pr << i
@@ -193,14 +202,19 @@ end
 
 
 def method_missing(method_name,*args,&block)
+
  if method_name[-3..-1] == '_is'
-     nd = {}
-     nd[:name] = args[0] if args[0].nil?
-     nd[:operands] = args[1]
-     nd[:params] = args[2]
-     @d[method_name[0..-4].to_sym] = nd
- else 
+
+     	nd = {}
+     	nd[:name] = args[0] if args[0].nil?
+     	nd[:operands] = args[1]
+     	nd[:params] = args[2]
+     	@d[method_name[0..-4].to_sym] = nd
+
+ else
+ 
      raise NoMethodError    
+
  end
 end
 
