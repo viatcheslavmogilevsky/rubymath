@@ -99,7 +99,7 @@ def parsing(arg)
  res = []
  b = 0
  f = true
- arr = arg.scan(/\d+(?:\.\d+)?|[<>]=|[\/*!\^\+\-<>\(\)]|=[!~]?|:\w+:|\[\w+\]|div|mod/)
+ arr = arg.scan(/\d+(?:\.\d+)?|[<>]=|[\/*!\^\+\-<>\(\)]|=[!~]?|:\w+:|\[\w+\]|div|mod|\w+/)
  arr << 42 # :-)
 
  arr.each do |elem|
@@ -111,36 +111,40 @@ def parsing(arg)
 	   		f = false
 		when /\^/
 	    		op << elem
-	    		pr << 1+b
+	    		pr << 2+b
    	    		f = false	
         	when /[\/*]|div|mod/
 	    		op << elem
-	    		pr << 2+b
+	    		pr << 3+b
 	    		f = false
 		when /\+/
  	    		op << elem
-	    		pr <<  3+b
+	    		pr <<  4+b
 	    		f = false
 		when /\-/
 	    		if f
 	    		op << elem + "-"
-	    		pr << 2+b
+	    		pr << 3+b
             		else
    	    		op << elem
-	    		pr << 3+b
+	    		pr << 4+b
 	    		end
 	    		f = false
         	when /[<>]=|=~?|[<>]/
 	    		op << elem
-	    		pr << 4+b	 
+	    		pr << 5+b	 
 	    		f = true   
 		when 42
             		op << elem
 	    		pr << 42 # xD
 		when /!/
 	    		op << elem
-	    		pr << 0+b
+	    		pr << 1+b
 	    		f = false
+		when /\w+/
+			op << elem
+			pr << 0+b
+			f = false
 		when /\(/
 	    		b -= 10
 	    		f = true
@@ -153,7 +157,7 @@ def parsing(arg)
  	while pr[-1] >= pr[-2]
 
 		nh[:name] = op[-2]	
-   		unless op[-2] == '--' or op[-2] == '!'
+   		unless op[-2] == '--' or op[-2] == '!' or pr[-2] % 10 == 0
 		nh[:operands] = stack[-2..-1]
 		stack.pop
 		else
