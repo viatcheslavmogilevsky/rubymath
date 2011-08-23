@@ -2,13 +2,13 @@ class Transform
 
 def initialize
  @d = {}
-
 end
 
 def getd
  @d 
 end
 
+=begin
 def puzzle()
  
 end
@@ -55,7 +55,7 @@ etape 1: + -(2)  * /  %(1) ^ (0)  @@@@@@@@@  _ ! @@@@@@@@@@@@  and 1234
 # arg.scan(/\d+(?:\.\d+)?|[\/%*!\^\(\)=\+\-]|:\w+:|\w+/)
 #end
 
-
+=begin
 def getContentML
 
 end
@@ -85,9 +85,13 @@ def parsing(arg)
 end
 =end
 
+def fatd
 
+ 
+end
 
 def parsing(arg)
+
  stack = []
  pr = [44,43]
  op = []
@@ -97,7 +101,8 @@ def parsing(arg)
  f = true
  arr = arg.scan(/\d+(?:\.\d+)?|[<>]=|[\/*!\^\+\-<>\(\)]|=[!~]?|:\w+:|\[\w+\]|div|mod/)
  arr << 42 # :-)
- arr.each_with_index do |elem,ind|
+
+ arr.each do |elem|
 
  	case elem
 
@@ -135,7 +140,6 @@ def parsing(arg)
 		when /!/
 	    		op << elem
 	    		pr << 0+b
-	    		arr.insert ind+1,"0"
 	    		f = false
 		when /\(/
 	    		b -= 10
@@ -149,15 +153,15 @@ def parsing(arg)
  	while pr[-1] >= pr[-2]
 
 		nh[:name] = op[-2]	
-   		unless op[-2] == '--'
+   		unless op[-2] == '--' or op[-2] == '!'
 		nh[:operands] = stack[-2..-1]
 		stack.pop
 		else
 		nh[:operands] = [stack[-1]]
 		end
 		res <<  nh
+		nh = {}
         	stack[-1] =  res.size - 1
- 		nh = {}
 		pr.delete_at(-2)
 		op.delete_at(-2)
 
@@ -173,7 +177,9 @@ def parsing(arg)
     eli = pr.shift
 
     if res[eli][:name] =~ /(\+|\*|=|[<>]=?)$/
+
      		res[eli][:operands].each_with_index do |i,index|
+
       		  if i.is_a?(Fixnum)
       	          if res[i][:name] == res[eli][:name]
 		      res[eli][:operands].insert index+1,res[i][:operands]
@@ -182,7 +188,9 @@ def parsing(arg)
   	    	      res[i][:operands] = []
                   end
                   end
+
                 end
+
     end
 
     res[eli][:operands].each do |i|
@@ -211,13 +219,11 @@ def method_missing(method_name,*args,&block)
      	nd[:params] = args[2]
      	@d[method_name[0..-4].to_sym] = nd
 
- else
- 
-     raise NoMethodError    
-
+ else raise NoMethodError    
  end
 end
 
+=begin
 def spos
  rec @d[:main]
 end
@@ -240,6 +246,6 @@ def rec(arg)
  end
  result += ")"
 end
-
+=end
 
 end
