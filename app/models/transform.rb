@@ -2,6 +2,23 @@ class Transform
 
 def initialize
  @d = {}
+ @s = { :^ => "power",
+	:/ => "divide",
+	:* => "times", 
+	:div => "quotient",
+	:mod => "remainder",
+	:+ => "plus",
+	:- => "minus",
+	:"--" => "minus",
+	:"=" => "eq",
+	:"=!" => "neq",
+	:> => "gt",
+	:< => "lt",
+	:>= => "geq",
+	:<= => "leq",
+	:! => "factorial"
+	
+      }
 end
 
 def getd
@@ -85,9 +102,40 @@ def parsing(arg)
 end
 =end
 
-def fatd
+def gettoken(arg)
 
- 
+ if arg.is_a?(Fixnum)
+	"<cn>#{arg}</cn>"
+ else
+ 	"<cs>#{arg}</cs>"
+ end
+
+end
+
+
+def getmarkup
+ fatd(1,@d[:main]) 
+end
+
+
+def fatd(tab,arg)
+
+ res = []
+ res << "#{' '*tab  }<apply>"
+ res << "#{' '*tab  }<#{arg[:name]}/>"
+
+ 	arg[:operands].each do |elem|
+
+		unless @d[elem].nil? 
+			res << fatd(tab*2,@d[elem])
+			res.flatten!
+		else
+			res << gettoken(elem)	
+		end
+
+	end 
+  
+ res << "#{' '*tab  }</apply>"
 end
 
 def parsing(arg)
@@ -130,10 +178,14 @@ def parsing(arg)
 	    		pr << 4+b
 	    		end
 	    		f = false
-        	when /[<>]=|=~?|[<>]/
+        	when /[<>]=?|=[!~]?/
 	    		op << elem
 	    		pr << 5+b	 
-	    		f = true   
+	    		f = true
+		when /,/
+			op << elem
+			pr << 6+b
+			f = true   
 		when 42
             		op << elem
 	    		pr << 42 # xD
@@ -180,7 +232,7 @@ def parsing(arg)
 
     eli = pr.shift
 
-    if res[eli][:name] =~ /(\+|\*|=|[<>]=?)$/
+    if res[eli][:name] =~ /(\+|\*|=|[<>]=?|,)$/
 
      		res[eli][:operands].each_with_index do |i,index|
 
@@ -218,13 +270,15 @@ def method_missing(method_name,*args,&block)
  if method_name[-3..-1] == '_is'
 
      	nd = {}
-     	nd[:name] = args[0] if args[0].nil?
-     	nd[:operands] = args[1]
+     	nd[:name] = args[0] 
+     	nd[:operands] = [args[1]]
+	nd[:operands].flatten!
      	nd[:params] = args[2]
      	@d[method_name[0..-4].to_sym] = nd
 
  else raise NoMethodError    
  end
+
 end
 
 =begin
