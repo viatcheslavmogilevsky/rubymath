@@ -147,10 +147,10 @@ def parsing(arg)
  res = []
  b = 0
  f = true
- arr = arg.scan(/\d+(?:\.\d+)?|[<>]=|[\/*!\^\+\-<>\(\)]|=[!~]?|:\w+:|\[\w+\]|div|mod|\w+/)
+ arr = arg.scan(/\d+(?:\.\d+)?|[<>]=|[\/*!\^\+\-<>\(\),]|=[!~]?|:\w+:|\[\w+\]|div|mod|\w+/)
  arr << 42 # :-)
 
- arr.each do |elem|
+ arr.each_with_index do |elem,i|
 
  	case elem
 
@@ -194,8 +194,12 @@ def parsing(arg)
 	    		pr << 1+b
 	    		f = false
 		when /\w+/
+			if arr[i+1] == '('
 			op << elem
 			pr << 0+b
+			else
+			stack << elem
+			end
 			f = false
 		when /\(/
 	    		b -= 10
