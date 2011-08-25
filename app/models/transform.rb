@@ -205,7 +205,7 @@ def parsing(arg)
 			arr[i+1] = '['
 			elsif arr[i-1] == '(' and arr[i+1] == ')'
 			stack << "&#{elem}"
-			elsif /div|mod/ === elem
+			elsif /^(div|mod)$/ === elem
 			op << elem
 			pr << 3+b
 			else
