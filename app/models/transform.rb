@@ -107,6 +107,19 @@ def parsing(arg)
 end
 =end
 
+
+def getelem(arg)
+
+ el = arg[:name].to_sym
+ res = []
+ res << "<apply>"
+ res << "<#{@s.fetch(el,el)}/>"
+ arg[:operands].each { |elem|  res << elem }
+ res << "</apply>"
+
+end
+
+
 def gettoken(tab,arg)
 
  if arg.is_a?(Fixnum)
@@ -126,22 +139,56 @@ end
 def fatd(tab,arg)
 
  res = []
- res << "#{' '*tab  }<apply>"
- res << "#{' '*tab  }<#{arg[:name]}/>"
 
- 	arg[:operands].each do |elem|
+ case arg[:name]
+ 
+ when :a
+ 	arr = parsing(arg[:operands][0])
+	sub = [arr.size-1]
+	sub.each_with_index do |e,i|
 
-		unless @d[elem].nil? 
-			res << fatd(tab*2,@d[elem])
-			res.flatten!
+	if e.is_a?(Fixnum)
+
+        	if arr[e][:name]
+ 		sub[i] = getelem(arr[e])  
+		sub.flatten!
 		else
-			res << gettoken(tab*2,elem)	
-		end
+		sub[i] = nil
+		end	 
 
-	end 
-  
- res << "#{' '*tab  }</apply>"
+        end
+
+	end	
+	res = sub.compact
+
+
+
+ else
+	 res << "#{' '*tab  }<apply>"
+ 	 res << "#{' '*tab  }<#{arg[:name]}/>"
+ 	 arg[:operands].each do |elem|
+	 	unless @d[elem].nil? 
+	 	res << fatd(tab*2,@d[elem])
+	 	res.flatten!
+		else
+	 	res << gettoken(tab*2,elem)	
+	 	end
+	 end 
+ 	 res << "#{' '*tab  }</apply>"
+ end
+
+
+ 
+ res 	 
+	 
+	 
+		 
+
+
 end
+
+
+
 
 def parsing(arg)
 
@@ -212,7 +259,7 @@ def parsing(arg)
 			stack << elem
 			end
 			f = false
-		when /\(\[/
+		when /[\(\[]/
 	    		b -= 10
 	    		f = true
 		when /\)/
