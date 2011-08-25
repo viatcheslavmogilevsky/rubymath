@@ -1,5 +1,10 @@
 class Transform 
 
+
+
+
+
+
 def initialize
  @d = {}
  @s = { :^ => "power",
@@ -102,12 +107,12 @@ def parsing(arg)
 end
 =end
 
-def gettoken(arg)
+def gettoken(tab,arg)
 
  if arg.is_a?(Fixnum)
-	"<cn>#{arg}</cn>"
+	"#{' '*tab  }<cn>#{arg}</cn>"
  else
- 	"<cs>#{arg}</cs>"
+ 	"#{' '*tab  }<cs>#{arg}</cs>"
  end
 
 end
@@ -130,7 +135,7 @@ def fatd(tab,arg)
 			res << fatd(tab*2,@d[elem])
 			res.flatten!
 		else
-			res << gettoken(elem)	
+			res << gettoken(tab*2,elem)	
 		end
 
 	end 
@@ -141,27 +146,27 @@ end
 def parsing(arg)
 
  stack = []
- pr = [44,43]
+ pr = [44,43] # )))
  op = []
  nh = {}
  res = []
  b = 0
  f = true
- arr = arg.scan(/\d+(?:\.\d+)?|[<>]=|[\/*!\^\+\-<>\(\),]|=[!~]?|:\w+:|\[\w+\]|div|mod|\w+/)
+ arr = arg.scan(/\d+(?:[\.%]\d+)?|[<>]=|[\/*!\^\+\-<>\(\),]|=[!~]?|\w+/)
  arr << 42 # :-)
 
  arr.each_with_index do |elem,i|
 
  	case elem
 
-		when /\d+(?:\.\d+)?|:\w+:|\[\w+\]/
+		when /\d+(?:[\.%]\d+)?/
 	   		stack << elem
 	   		f = false
 		when /\^/
 	    		op << elem
 	    		pr << 2+b
    	    		f = false	
-        	when /[\/*]|div|mod/
+        	when /[\/*]/
 	    		op << elem
 	    		pr << 3+b
 	    		f = false
@@ -197,6 +202,11 @@ def parsing(arg)
 			if arr[i+1] == '('
 			op << elem
 			pr << 0+b
+			elsif arr[i-1] == '(' and arr[i+1] == ')'
+			stack << "&#{elem}"
+			elsif /div|mod/ === elem
+			op << elem
+			pr << 3+b
 			else
 			stack << elem
 			end
@@ -236,7 +246,7 @@ def parsing(arg)
 
     eli = pr.shift
 
-    if res[eli][:name] =~ /(\+|\*|=|[<>]=?|,)$/
+    if res[eli][:name] =~ /(\+|\*|=!?|[<>]=?|,)$/
 
      		res[eli][:operands].each_with_index do |i,index|
 
