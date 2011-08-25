@@ -202,6 +202,7 @@ def parsing(arg)
 			if arr[i+1] == '('
 			op << elem
 			pr << 0+b
+			arr[i+1] = '['
 			elsif arr[i-1] == '(' and arr[i+1] == ')'
 			stack << "&#{elem}"
 			elsif /div|mod/ === elem
@@ -211,7 +212,7 @@ def parsing(arg)
 			stack << elem
 			end
 			f = false
-		when /\(/
+		when /\(\[/
 	    		b -= 10
 	    		f = true
 		when /\)/
