@@ -146,7 +146,6 @@ def fatd(tab,arg)
  	arr = parsing(arg[:operands][0])
 	sub = [arr.size-1]
 	sub.each_with_index do |e,i|
-
 	if e.is_a?(Fixnum)
 
         	if arr[e][:name]
@@ -157,7 +156,6 @@ def fatd(tab,arg)
 		end	 
 
         end
-
 	end	
 	res = sub.compact
 
@@ -176,7 +174,6 @@ def fatd(tab,arg)
 	 end 
  	 res << "#{' '*tab  }</apply>"
  end
-
 
  
  res 	 
