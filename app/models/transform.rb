@@ -114,29 +114,58 @@ def getelem(arg)
  res = []
  res << "<apply>"
  res << "<#{@s.fetch(el,el)}/>"
- arg[:operands].each { |elem|  res << elem }
+ arg[:operands].each do |elem|
+  res << getsymbol(elem)
+  res.flatten! 
+ end
  res << "</apply>"
 
 end
 
+def getsymbol(arg)
+ 
+ case arg
 
-def gettoken(tab,arg)
+ when /\d+(?:\.\d+)?/
+	["<cs> #{arg} </cn>"]
+ when /\d+%\d+/
+	arr = arg.scan(/\d+/)
+	["<cn type=\"rational\"> #{arr[0]}<sep/>#{arr[1]} </cn>"]
+ when /&\w+/
+	["<#{arg[/\w+/]}/>"]
+ when /\w+/
+	arg1 = arg.to_sym
+	if @d[arg1]
+	fatd(@d[arg1])
+	else
+	["<cs> #{arg} </cs>"]
+	end
+ end
+
+
+
+end
+
+
+
+
+def gettoken(arg)
 
  if arg.is_a?(Fixnum)
-	"#{' '*tab  }<cn>#{arg}</cn>"
+	"<cn>#{arg}</cn>"
  else
- 	"#{' '*tab  }<cs>#{arg}</cs>"
+ 	"<cs>#{arg}</cs>"
  end
 
 end
 
 
 def getmarkup
- fatd(1,@d[:main]) 
+ fatd(@d[:main]) 
 end
 
 
-def fatd(tab,arg)
+def fatd(arg)
 
  res = []
 
@@ -162,17 +191,17 @@ def fatd(tab,arg)
 
 
  else
-	 res << "#{' '*tab  }<apply>"
- 	 res << "#{' '*tab  }<#{arg[:name]}/>"
+	 res << "<apply>"
+ 	 res << "<#{arg[:name]}/>"
  	 arg[:operands].each do |elem|
 	 	unless @d[elem].nil? 
-	 	res << fatd(tab*2,@d[elem])
+	 	res << fatd(@d[elem])
 	 	res.flatten!
 		else
-	 	res << gettoken(tab*2,elem)	
+	 	res << gettoken(elem)	
 	 	end
 	 end 
- 	 res << "#{' '*tab  }</apply>"
+ 	 res << "</apply>"
  end
 
  
